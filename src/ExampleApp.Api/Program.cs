@@ -1,4 +1,5 @@
 using ExampleApp.Api.Domain.Academia;
+using ExampleApp.Api.Domain.Students;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AcademiaDbContext>(
+    opt => opt.UseSqlServer(config.GetConnectionString("Default")));
+builder.Services.AddDbContext<StudentsDbContext>(
     opt => opt.UseSqlServer(config.GetConnectionString("Default")));
 builder.Services.AddMediatR(
     cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
