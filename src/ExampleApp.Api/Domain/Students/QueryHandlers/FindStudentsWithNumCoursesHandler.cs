@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExampleApp.Api.Domain.Students.QueryHandlers;
 
-internal class GetStudentsWithNumCoursesHandler : IRequestHandler<GetStudentsWithNumCoursesQuery, ICollection<Student>>
+internal class FindStudentsWithNumCoursesHandler : IRequestHandler<FindStudentsWithNumCoursesQuery, ICollection<Student>>
 {
     private readonly StudentsDbContext _context;
 
-    public GetStudentsWithNumCoursesHandler(StudentsDbContext context)
+    public FindStudentsWithNumCoursesHandler(StudentsDbContext context)
     {
         _context = context;
     }
 
-    public async Task<ICollection<Student>> Handle(GetStudentsWithNumCoursesQuery request, CancellationToken cancellationToken)
+    public async Task<ICollection<Student>> Handle(FindStudentsWithNumCoursesQuery request, CancellationToken cancellationToken)
     {
         DateOnly dateOnlyCurrentVal = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
  

@@ -5,6 +5,17 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Domain\Students\CommandHandles\**" />
+      <Compile Remove="Domain\Students\Commands\**" />
+      <Content Remove="Domain\Students\CommandHandles\**" />
+      <Content Remove="Domain\Students\Commands\**" />
+      <EmbeddedResource Remove="Domain\Students\CommandHandles\**" />
+      <EmbeddedResource Remove="Domain\Students\Commands\**" />
+      <None Remove="Domain\Students\CommandHandles\**" />
+      <None Remove="Domain\Students\Commands\**" />
+    </ItemGroup>
     <ItemGroup>
         <InternalsVisibleTo Include="ExampleApp.Tests" />
         <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
@@ -15,10 +26,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.13" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.13" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Domain\Students\Commands\" />
-      <Folder Include="Domain\Students\CommandHandles\" />
     </ItemGroup>
 
 </Project>

@@ -20,25 +20,27 @@ public class CoursesController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetCurrentCourses")]
+    [HttpGet(Name = "GetCurrentCoursesTask3")]
     public async Task<IEnumerable<CourseModel>> GetCurrent()
     {
         DateOnly today = new(2023, 9, 1);
-        ICollection<Course> courses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
+        ICollection<Course> courses = await _mediator.Send(new FindCoursesActiveOnDateQuery(today));
         _logger.LogInformation("Retrieved {Count} current courses", courses.Count);
 
         List<CourseModel> models = new();
 
-        foreach (var course in courses)
-        {
-            var semesterModel = new KeyNameModel(course.Semester.Id, course.Semester.Description);
-            var professorModel = new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName);
-            CourseModel courseModel = new(course.Id, course.Description, semesterModel, professorModel);
-            models.Add(courseModel);
-        }
+        ///TASK 3
+        ///Convert the foreach loop present in CourseController.GetCurrent into a "one-liner" LINQ statement, retaining the same structure the method returns.
+
+        models.AddRange(courses.Select(course => new CourseModel(
+                    course.Id, course.Description,
+                    new KeyNameModel(course.Semester.Id, course.Semester.Description),
+                    new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName)
+                )));
 
         return models;
     }
+
 
     [HttpPatch(Name = "UpdatesProfessor")]
     public async Task<ActionResult> UpdateProfessor([FromBody] ProfessorUpdateModel model)

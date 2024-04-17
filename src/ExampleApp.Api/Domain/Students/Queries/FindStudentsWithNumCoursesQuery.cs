@@ -3,4 +3,4 @@ using MediatR;
 
 namespace ExampleApp.Api.Domain.Students.Queries;
 
-internal record GetStudentsWithNumCoursesQuery() : IRequest<ICollection<Student>>;
+internal record FindStudentsWithNumCoursesQuery() : IRequest<ICollection<Student>>;
