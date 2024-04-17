@@ -20,27 +20,38 @@ public class CoursesController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetCurrentCoursesTask3")]
-    public async Task<IEnumerable<CourseModel>> GetCurrent()
+	[HttpGet(Name = "GetCurrentCoursesTask4")]
+    public async Task<CurrentSemesterResponseModel> GetCurrentTask4()
     {
-        DateOnly today = new(2023, 9, 1);
+        DateOnly today = new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
         ICollection<Course> courses = await _mediator.Send(new FindCoursesActiveOnDateQuery(today));
         _logger.LogInformation("Retrieved {Count} current courses", courses.Count);
 
-        List<CourseModel> models = new();
+        CurrentSemesterResponseModel model = new();
 
-        ///TASK 3
-        ///Convert the foreach loop present in CourseController.GetCurrent into a "one-liner" LINQ statement, retaining the same structure the method returns.
+        model = courses.Select(course => new CurrentSemesterResponseModel()
+        {
+            Semester = new SemesterResponseModel()
+            {
+                StartDate = course.Semester.Start,
+                EndDate = course.Semester.End,
+                Key = course.Semester.Id,
+                Name = course.Semester.Description,
+                Courses = courses.Where(x => x.Semester.Id == course.Semester.Id).Select(x => new CourseResponseModel()
+                {
+                    Key = x.Id,
+                    Name = x.Description,
+                    Professor = new ProfessorResponseModel()
+                    {
+                        Key = x.Professor.Id.ToString(),
+                        Name = x.Professor.FullName
+                    }
+                }).ToList()
+            }
+        }).First();
 
-        models.AddRange(courses.Select(course => new CourseModel(
-                    course.Id, course.Description,
-                    new KeyNameModel(course.Semester.Id, course.Semester.Description),
-                    new KeyNameModel(course.Professor.Id.ToString(), course.Professor.FullName)
-                )));
-
-        return models;
+        return model;
     }
-
 
     [HttpPatch(Name = "UpdatesProfessor")]
     public async Task<ActionResult> UpdateProfessor([FromBody] ProfessorUpdateModel model)
