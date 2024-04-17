@@ -112,7 +112,7 @@ public class StudentControllerTests
             ResidenceStatus = "InState"
         };
 
-        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Semester semester = new Semester("sem1", "sem-1", DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today.AddMonths(9)));
         Professor professor =  new Professor() { FullName = "Test Jones"};
         Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
@@ -145,7 +145,7 @@ public class StudentControllerTests
             ResidenceStatus = "InState"
         };
 
-        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Semester semester = new Semester("sem1", "sem-1", DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today.AddMonths(9)));
         Professor professor = new Professor() { FullName = "Test Jones" };
         Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
@@ -178,7 +178,7 @@ public class StudentControllerTests
             ResidenceStatus = "InState"
         };
 
-        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Semester semester = new Semester("sem1", "sem-1", DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today.AddMonths(9)));
         Professor professor = new Professor() { FullName = "Test Jones" };
 
         _mediator.Send(new FindCourseByIdQuery(studentToRegister.CourseId, includeSemester: true)).ReturnsNull();
@@ -202,7 +202,7 @@ public class StudentControllerTests
             FullName = "John Doe"
         };
 
-        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Semester semester = new Semester("sem1", "sem-1", DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today.AddMonths(9)));
         Professor professor = new Professor() { FullName = "Test Jones" };
 
         _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).ReturnsNull();
@@ -241,7 +241,7 @@ public class StudentControllerTests
             StudentId = 1
         };
 
-        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Semester semester = new Semester("sem1", "sem-1", DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today.AddMonths(9)));
         Professor professor = new Professor() { FullName = "Test Jones" };
         Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
@@ -275,7 +275,7 @@ public class StudentControllerTests
             ResidenceStatus = "InState"
         };
 
-        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Semester semester = new Semester("sem1", "sem-1", DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today.AddMonths(9)));
         Professor professor = new Professor() { FullName = "Test Jones" };
         Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
@@ -329,7 +329,7 @@ public class StudentControllerTests
             FullName = "John Doe"
         };
 
-        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Semester semester = new Semester("sem1", "sem-1", DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today.AddMonths(9)));
         Professor professor = new Professor() { FullName = "Test Jones" };
 
         _mediator.Send(new FindStudentQuery(studentToUnRegister.FullName, studentToUnRegister.BadgeNumber)).ReturnsNull();
