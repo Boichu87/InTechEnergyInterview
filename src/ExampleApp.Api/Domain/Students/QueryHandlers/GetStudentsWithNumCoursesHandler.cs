@@ -16,19 +16,22 @@ internal class GetStudentsWithNumCoursesHandler : IRequestHandler<GetStudentsWit
 
     public async Task<ICollection<Student>> Handle(GetStudentsWithNumCoursesQuery request, CancellationToken cancellationToken)
     {
-        var results = await _context.Students
-                    .Join(_context.StudentCourses, student => student.Id, studentCourse => studentCourse.StudentId, (student, studentCourse) => new { student, studentCourse })
-                    .GroupBy(s => new { s.student.Id, s.student.FullName, s.student.Badge, s.student.ResidenceStatus })
-                    .Select(s => new Student()
-                    {
-                        Id = s.Key.Id,
-                        FullName = s.Key.FullName,
-                        Badge = s.Key.Badge,
-                        ResidenceStatus = s.Key.ResidenceStatus,
-                        CourseCount = s.Count()
-                    })
-                    .ToListAsync(cancellationToken: cancellationToken);
+        DateOnly dateOnlyCurrentVal = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
+ 
+        var currentStudents = await _context.Students
+                                .Join(_context.StudentCourses, student => student.Id, studentCourse => studentCourse.StudentId, (student, studentCourse) => new { student, studentCourse })
+                                .Join(_context.Semesters, joinedData => joinedData.studentCourse.SemesterId, semester => semester.Id, (joinedData, semester) => new { student = joinedData.student, studentCourse = joinedData.studentCourse, semester })
+                                .Where(data => dateOnlyCurrentVal >= data.semester.Start && dateOnlyCurrentVal <= data.semester.End)
+                                .GroupBy(data => new { data.student.Id, data.student.FullName, data.student.Badge, data.student.ResidenceStatus })
+                                .Select(s => new Student()
+                                        {
+                                            Id = s.Key.Id,
+                                            FullName = s.Key.FullName,
+                                            Badge = s.Key.Badge,
+                                            ResidenceStatus = s.Key.ResidenceStatus,
+                                            CourseCount = s.Count()
+                                        }).ToListAsync(cancellationToken: cancellationToken);
 
-        return results;
+        return currentStudents;
     }
 }
