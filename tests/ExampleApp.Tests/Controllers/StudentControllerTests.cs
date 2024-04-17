@@ -23,7 +23,7 @@ public class StudentControllerTests
     }
 
     [Fact]
-    public async Task MapCurrentStudentsWithNumCourses()
+    public async Task Task1_MapCurrentStudentsWithNumCourses()
     {
         // Arrange
         List<Student> students = new()
@@ -117,11 +117,10 @@ public class StudentControllerTests
         Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
         _mediator.Send(new FindCourseByIdQuery(studentToRegister.CourseId, includeSemester: true)).Returns(courseToRegister);
-        _mediator.Send(new GetStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
+        _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
 
         // Act
         var response = await new StudentsController(_mediator, _logger).RegisterStudent(studentToRegister);
-
 
         // Assert
         response.Should().BeEquivalentTo(new ApiResponse<string> { StatusCode = System.Net.HttpStatusCode.Created, Success = true, Message = "Student successfuly registered." });
@@ -151,7 +150,7 @@ public class StudentControllerTests
         Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
         _mediator.Send(new FindCourseByIdQuery(studentToRegister.CourseId, includeSemester: true)).Returns(courseToRegister);
-        _mediator.Send(new GetStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
+        _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
 
         // Act
         var response = await new StudentsController(_mediator, _logger).RegisterStudent(studentToRegister);
@@ -182,13 +181,11 @@ public class StudentControllerTests
         Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
         Professor professor = new Professor() { FullName = "Test Jones" };
 
-
         _mediator.Send(new FindCourseByIdQuery(studentToRegister.CourseId, includeSemester: true)).ReturnsNull();
-        _mediator.Send(new GetStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
+        _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
 
         // Act
         var response = await new StudentsController(_mediator, _logger).RegisterStudent(studentToRegister);
-
 
         // Assert
         response.Should().BeEquivalentTo(new NotFoundObjectResult("Invalid Course TEST") { StatusCode = 404 });
@@ -208,15 +205,139 @@ public class StudentControllerTests
         Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
         Professor professor = new Professor() { FullName = "Test Jones" };
 
-        _mediator.Send(new GetStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).ReturnsNull();
+        _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).ReturnsNull();
 
         // Act
         var response = await new StudentsController(_mediator, _logger).RegisterStudent(studentToRegister);
 
+        // Assert
+        response.Should().BeEquivalentTo(new NotFoundObjectResult("Student Not Found.") { StatusCode = 404 });
+
+    }
+
+    [Fact]
+    public async Task Task3_UnRegisterStudentToCourse_Ok()
+    {
+        //Arrange
+        StudentRegisterModel studentToRegister = new StudentRegisterModel()
+        {
+            BadgeNumber = "101",
+            CourseId = "TEST",
+            FullName = "John Doe"
+        };
+
+        Student student = new Student()
+        {
+            Id = 1,
+            FullName = "John Doe",
+            Badge = "101",
+            ResidenceStatus = "InState"
+        };
+
+        StudentCourse studentCourse = new StudentCourse()
+        {
+            CourseId = "1",
+            SemesterId = "2024-01",
+            StudentId = 1
+        };
+
+        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Professor professor = new Professor() { FullName = "Test Jones" };
+        Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+
+        _mediator.Send(new FindCourseByIdQuery(studentToRegister.CourseId, includeSemester: true)).Returns(courseToRegister);
+        _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
+        _mediator.Send(new FindStudentCourseRegistrationByIdQuery(student.Id, courseToRegister.Id, semester.Id)).Returns(studentCourse);
+        
+        // Act
+        var response = await new StudentsController(_mediator, _logger).UnRegisterStudent(studentToRegister);
+
+        // Assert
+        response.Should().BeEquivalentTo(new ApiResponse<string> { StatusCode = System.Net.HttpStatusCode.Accepted, Success = true, Message = "Student successfuly un-registered." });
+    }
+
+    [Fact]
+    public async Task Task3_UnRegisterStudentToCourse_InvalidParameters()
+    {
+        //Arrange
+        StudentRegisterModel studentToRegister = new StudentRegisterModel()
+        {
+            BadgeNumber = null,
+            CourseId = "TEST",
+            FullName = null
+        };
+
+        Student student = new Student()
+        {
+            Id = 1,
+            FullName = "John Doe",
+            Badge = "101",
+            ResidenceStatus = "InState"
+        };
+
+        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Professor professor = new Professor() { FullName = "Test Jones" };
+        Course courseToRegister = new Course("TEST", "TEST course", semester, professor, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+
+        _mediator.Send(new FindCourseByIdQuery(studentToRegister.CourseId, includeSemester: true)).Returns(courseToRegister);
+        _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
+
+        // Act
+        var response = await new StudentsController(_mediator, _logger).UnRegisterStudent(studentToRegister);
+
+        // Assert
+        response.Should().BeEquivalentTo(new UnprocessableEntityObjectResult("At least BadgeNumber or FullName must be provided for Student registration.") { StatusCode = 422 });
+    }
+
+    [Fact]
+    public async Task Task3_UnRegisterStudentToCourse_CourseNotFound()
+    {
+        //Arrange
+        StudentRegisterModel studentToRegister = new StudentRegisterModel()
+        {
+            BadgeNumber = "101",
+            CourseId = "TEST",
+            FullName = "John Doe"
+        };
+
+        Student student = new Student()
+        {
+            Id = 1,
+            FullName = "John Doe",
+            Badge = "101",
+            ResidenceStatus = "InState"
+        };
+ 
+        _mediator.Send(new FindCourseByIdQuery(studentToRegister.CourseId, includeSemester: true)).ReturnsNull();
+        _mediator.Send(new FindStudentQuery(studentToRegister.FullName, studentToRegister.BadgeNumber)).Returns(student);
+
+        // Act
+        var response = await new StudentsController(_mediator, _logger).UnRegisterStudent(studentToRegister);
+
+        // Assert
+        response.Should().BeEquivalentTo(new NotFoundObjectResult("Invalid Course TEST") { StatusCode = 404 });
+    }
+
+    [Fact]
+    public async Task Task3_UnRegisterStudentToCourse_StudentNotFound()
+    {
+        //Arrange
+        StudentRegisterModel studentToUnRegister = new StudentRegisterModel()
+        {
+            BadgeNumber = "101",
+            CourseId = "TEST",
+            FullName = "John Doe"
+        };
+
+        Semester semester = new Semester() { Start = DateOnly.FromDateTime(DateTime.UtcNow), End = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)) };
+        Professor professor = new Professor() { FullName = "Test Jones" };
+
+        _mediator.Send(new FindStudentQuery(studentToUnRegister.FullName, studentToUnRegister.BadgeNumber)).ReturnsNull();
+
+        // Act
+        var response = await new StudentsController(_mediator, _logger).UnRegisterStudent(studentToUnRegister);
 
         // Assert
         response.Should().BeEquivalentTo(new NotFoundObjectResult("Student Not Found.") { StatusCode = 404 });
     }
-
-
 }
