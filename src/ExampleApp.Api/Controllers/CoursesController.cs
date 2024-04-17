@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ExampleApp.Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class CoursesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -27,7 +27,8 @@ public class CoursesController : ControllerBase
         ICollection<Course> courses = await _mediator.Send(new GetCoursesActiveOnDateQuery(today));
         _logger.LogInformation("Retrieved {Count} current courses", courses.Count);
 
-        List <CourseModel> models = new();
+        List<CourseModel> models = new();
+
         foreach (var course in courses)
         {
             var semesterModel = new KeyNameModel(course.Semester.Id, course.Semester.Description);

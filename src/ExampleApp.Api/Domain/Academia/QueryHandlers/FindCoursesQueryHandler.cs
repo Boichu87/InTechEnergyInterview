@@ -14,6 +14,15 @@ internal class FindCoursesQueryHandler : IRequestHandler<FindCourseByIdQuery, Co
     }
 
     public async Task<Course?> Handle(FindCourseByIdQuery request, CancellationToken cancellationToken)
-        => await _context.Courses
+    {
+        if (request.includeSemester)
+        {
+            return await _context.Courses
+            .Include(c => c.Semester)
             .FirstOrDefaultAsync(c => c.Id == request.Name, cancellationToken);
+        }
+
+        return await _context.Courses
+            .FirstOrDefaultAsync(c => c.Id == request.Name, cancellationToken);
+    }
 }
