@@ -207,12 +207,19 @@ public partial class StudentsController : ControllerBase
 
 
 
-    [HttpPost(Name = "BatchRegistration")]
-    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status400BadRequest)]
+    /// <summary>
+    /// Mock  endpoint for upload a file in order to create a batch students registration feature for BONUS TASK 6
+    /// </summary>
+    /// <param name="importType">Could be a user defined type from a defined string group (xls, pdf, csv)</param>
+    /// <param name="formFile">The file to be uploaded (Restriction in the type must be included of course, both in back-end or the consumer client</param>
+    /// <returns></returns>
+    [HttpPost("{importType}")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> BatchRegistration(string importType, IFormFile formFile)
     {
         //TASK 6
@@ -235,16 +242,25 @@ public partial class StudentsController : ControllerBase
         //discuss how this would change if the application was deployed to a cloud provider like Azure or AWS: what services would you use then?
         //Setting Up
 
+
         ///MY ANSWER FOR THIS
         ///DIFICULT ANSWER WITH SO LITTLE INFO, BUT I WILL ASSUME A LOT FOR THE SAKE OF AN ANSWER.
         ///We can avoid EF completely if ExecuteUpdate (currently in EF 7 is not fast enough)
-        ///Use a transaction with a sql MERGE maintaned in the app (not the best but still is in the project) against an Origin temp table (or a regular teable for this purpose with a proper tracking state columns for this process)  with the values to import,
+        ///Use a transaction with a sql MERGE within (or not) in the app (not the best but still is in the project) against an Origin temp table (or a regular teable for this purpose with a proper tracking state columns for this process)  with the values to import,
         ///For that Origin table using their badge as an improvised join ID culd be a posssibility,
         ///if the badge doesnt exist in the Target table of StudentCourse (already joined with student for the course in order th check their Badges, supossing those are Unique), and is in the current semester (asumming that with other validations) just insert the record.
         ///Of course that solution is not the best for track, you will require extra logic and effort thtat will consume development effort, testing, maintanance, for keep track of the inserted bulk or if there were other issue, for example, a failure in the middle of the process. Which strategy to use in there, let's say, is out of scope
         ///Considering we are not using the EF at all. Just classic bulk insert/update/delete strategies.
+        ///
+
+        ///Another solution (the more complex a probably more expensive in a cloud environment)
+        ///Just save the excel file in a blob storage or directly to a table in the db for this purpose and process it in the background with other service using sql transactions
+        ///For example, after persisting the file in the format defined, set an Azure Service Bus Queue entry and with other App service trough an Azure function to take that entry as an In Trigger, and trough it process it with a Receiver (worker, appService, or whatever we want to build) service using raw sql transactions with SQL MERGE for example to achieve the goals. (and with the proper rollback scenario, even lock features at data level until the process is properly completed).
+        ///After this is finished or not, do the proper queue handling and notificate back to the Sender Service (if this service is SPA app or another service just push the proper notification).
+
+
+        ///Both scenarios with their proper validations for content, file-type, size, etc.
 
         return null;
     }
-
-
+}
