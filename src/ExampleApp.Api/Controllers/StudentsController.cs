@@ -1,11 +1,16 @@
 using ExampleApp.Api.Controllers.Models;
+using ExampleApp.Api.Domain.Academia;
 using ExampleApp.Api.Domain.Academia.Commands;
 using ExampleApp.Api.Domain.Academia.Queries;
 using ExampleApp.Api.Domain.Students;
 using ExampleApp.Api.Domain.Students.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 using System.Net;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.Intrinsics.X86;
 
 namespace ExampleApp.Api.Controllers;
 
@@ -199,4 +204,47 @@ public partial class StudentsController : ControllerBase
             return response;
         }
     }
-}
+
+
+
+    [HttpPost(Name = "BatchRegistration")]
+    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<string>, StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> BatchRegistration(string importType, IFormFile formFile)
+    {
+        //TASK 6
+        //As a new school year rolls by, the admin staff would like to be able to upload the student registration in bulk.
+
+        //They have a spreadsheet with a large number of elections.
+        //The spreadsheet has three columns:
+
+        //Student Name
+        //Student Badge
+        //Course Id
+        //Due to the very large size of this data set, EF exhibits poor performance creating the records.
+
+        //Provide a technical solution that ensures this large amount of data is inserted as fast as possible.
+
+        //Notes:
+
+        //the entry-point should still be the API: an end-point that accepts an Excel file upload --or CSV, and which then parses and loads the data therein into the database;
+        //        the solution should be entirely contained within the ExampleApp.Api project; you don't have access to the bulk-load tools provided by osql or similar command-line tools;
+        //discuss how this would change if the application was deployed to a cloud provider like Azure or AWS: what services would you use then?
+        //Setting Up
+
+        ///MY ANSWER FOR THIS
+        ///DIFICULT ANSWER WITH SO LITTLE INFO, BUT I WILL ASSUME A LOT FOR THE SAKE OF AN ANSWER.
+        ///We can avoid EF completely if ExecuteUpdate (currently in EF 7 is not fast enough)
+        ///Use a transaction with a sql MERGE maintaned in the app (not the best but still is in the project) against an Origin temp table (or a regular teable for this purpose with a proper tracking state columns for this process)  with the values to import,
+        ///For that Origin table using their badge as an improvised join ID culd be a posssibility,
+        ///if the badge doesnt exist in the Target table of StudentCourse (already joined with student for the course in order th check their Badges, supossing those are Unique), and is in the current semester (asumming that with other validations) just insert the record.
+        ///Of course that solution is not the best for track, you will require extra logic and effort thtat will consume development effort, testing, maintanance, for keep track of the inserted bulk or if there were other issue, for example, a failure in the middle of the process. Which strategy to use in there, let's say, is out of scope
+        ///Considering we are not using the EF at all. Just classic bulk insert/update/delete strategies.
+
+        return null;
+    }
+
+
