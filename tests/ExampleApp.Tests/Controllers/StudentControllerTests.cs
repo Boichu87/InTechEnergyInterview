@@ -123,7 +123,7 @@ public class StudentControllerTests
         var response = await new StudentsController(_mediator, _logger).RegisterStudent(studentToRegister);
 
         // Assert
-        response.Should().BeEquivalentTo(new ApiResponse<string> { StatusCode = System.Net.HttpStatusCode.Created, Success = true, Message = "Student successfuly registered." });
+        response.Should().BeEquivalentTo(new ApiResponseModel<string> { StatusCode = System.Net.HttpStatusCode.Created, Success = true, Message = "Student successfuly registered." });
     }
 
     [Fact]
@@ -253,7 +253,7 @@ public class StudentControllerTests
         var response = await new StudentsController(_mediator, _logger).UnRegisterStudent(studentToRegister);
 
         // Assert
-        response.Should().BeEquivalentTo(new ApiResponse<string> { StatusCode = System.Net.HttpStatusCode.Accepted, Success = true, Message = "Student successfuly un-registered." });
+        response.Should().BeEquivalentTo(new ApiResponseModel<string> { StatusCode = System.Net.HttpStatusCode.Accepted, Success = true, Message = "Student successfuly un-registered." });
     }
 
     [Fact]
