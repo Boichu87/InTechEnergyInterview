@@ -4,6 +4,7 @@ using ExampleApp.Api.Domain.Academia.Commands;
 using ExampleApp.Api.Domain.Academia.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ExampleApp.Api.Controllers;
 
@@ -21,7 +22,7 @@ public class CoursesController : ControllerBase
     }
 
 	[HttpGet(Name = "GetCurrentCoursesTask4")]
-    public async Task<CurrentSemesterResponseModel> GetCurrentTask4()
+    public async Task<JsonResult> GetCurrentTask4()
     {
         DateOnly today = new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
         ICollection<Course> courses = await _mediator.Send(new FindCoursesActiveOnDateQuery(today));
@@ -50,7 +51,7 @@ public class CoursesController : ControllerBase
             }
         }).First();
 
-        return model;
+        return  new JsonResult(JsonConvert.SerializeObject(model));
     }
 
     [HttpPatch(Name = "UpdatesProfessor")]
