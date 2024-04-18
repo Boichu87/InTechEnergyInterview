@@ -2,6 +2,9 @@ using ExampleApp.Api.Controllers;
 using Microsoft.Extensions.Logging;
 using ExampleApp.Api.Domain.Academia;
 using FluentAssertions;
+using ExampleApp.Api.Controllers.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ExampleApp.Tests;
 
@@ -45,7 +48,15 @@ public class CoursesControllerTests
         var response = await new CoursesController(_mediator, _logger).GetCurrentTask4();
 
         // Assert
-        response.Should()
+        JObject jsonObject = JObject.Parse(response.Value.ToString());
+
+        jsonObject.SelectToken("Semester.Courses[0].Lecturer").Should().HaveCountGreaterThan(0); //TASK 5  = Improved solution, Json Property now is called Lecturer as a JObject.
+
+
+        CurrentSemesterResponseModel? responseModel = JsonConvert.DeserializeObject<CurrentSemesterResponseModel>(response.Value.ToString());
+
+        responseModel.Should().NotBeNull();
+        responseModel.Should()
             .BeEquivalentTo(
                 new
                 {
