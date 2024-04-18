@@ -1,16 +1,11 @@
 using ExampleApp.Api.Controllers.Models;
-using ExampleApp.Api.Domain.Academia;
 using ExampleApp.Api.Domain.Academia.Commands;
 using ExampleApp.Api.Domain.Academia.Queries;
 using ExampleApp.Api.Domain.Students;
 using ExampleApp.Api.Domain.Students.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Drawing;
 using System.Net;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Runtime.Intrinsics.X86;
 
 namespace ExampleApp.Api.Controllers;
 
@@ -61,8 +56,8 @@ public partial class StudentsController : ControllerBase
     /// <returns></returns>
 
     [HttpPost(Name = "RegisterStudent")]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> RegisterStudent([FromBody] StudentRegisterModel model)
     {
         try
@@ -109,7 +104,7 @@ public partial class StudentsController : ControllerBase
         #endregion
 
          _ = await _mediator.Send(new RegisterStudentCourse(existingCourse.Id, student.Id, existingCourse.Semester.Id));
-        ApiResponse<string> response = new ApiResponse<string>();
+        ApiResponseModel<string> response = new ApiResponseModel<string>();
         response.StatusCode = HttpStatusCode.Created;
         response.Message = "Student successfuly registered.";
         response.Success = true;
@@ -119,7 +114,7 @@ public partial class StudentsController : ControllerBase
         catch (Exception ex)
         {
             //NOTE: Any kind of Exception handling was not required in tasks but added here at least, just in case.
-            ApiResponse<string> response = new ApiResponse<string>();
+            ApiResponseModel<string> response = new ApiResponseModel<string>();
             response.StatusCode = HttpStatusCode.InternalServerError;
             response.ErrorMessage = ex.Message;
             response.Success = false;
@@ -140,8 +135,8 @@ public partial class StudentsController : ControllerBase
     /// <returns></returns>
 
     [HttpPost(Name = "UnRegisterStudent")]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UnRegisterStudent([FromBody] StudentRegisterModel model)
     {
         try
@@ -187,7 +182,7 @@ public partial class StudentsController : ControllerBase
             #endregion
 
             _ = await _mediator.Send(new RegisterStudentCourse(existingCourse.Id, student.Id, existingCourse.Semester.Id));
-            ApiResponse<string> response = new ApiResponse<string>();
+            ApiResponseModel<string> response = new ApiResponseModel<string>();
             response.StatusCode = HttpStatusCode.Accepted;
             response.Message = "Student successfuly un-registered.";
             response.Success = true;
@@ -197,7 +192,7 @@ public partial class StudentsController : ControllerBase
         catch (Exception ex)
         {
             //NOTE: Any kind of Exception handling was not required in tasks but added here at least, just in case.
-            ApiResponse<string> response = new ApiResponse<string>();
+            ApiResponseModel<string> response = new ApiResponseModel<string>();
             response.StatusCode = HttpStatusCode.InternalServerError;
             response.ErrorMessage = ex.Message;
             response.Success = false;
@@ -215,11 +210,11 @@ public partial class StudentsController : ControllerBase
     /// <returns></returns>
     [HttpPost("{importType}")]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponseModel<string>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> BatchRegistration(string importType, IFormFile formFile)
     {
         //TASK 6

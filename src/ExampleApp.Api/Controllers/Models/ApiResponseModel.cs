@@ -5,7 +5,7 @@ namespace ExampleApp.Api.Controllers;
 
 public partial class StudentsController
 {
-    public class ApiResponse<T> : ActionResult
+    public class ApiResponseModel<T> : ActionResult
     {
         public HttpStatusCode StatusCode { get; set; }
         public bool Success { get; set; }
